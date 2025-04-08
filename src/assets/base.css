@@ -1,0 +1,21 @@
+* {
+  box-sizing: border-box;
+  font-family: "Roboto", sans-serif;
+}
+
+a {
+  text-decoration: none;
+}
+
+html {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  background-color: #e8e8e8;
+  min-height: 100vh;
+  padding-bottom: 50px;
+}
