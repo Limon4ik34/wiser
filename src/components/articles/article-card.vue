@@ -38,7 +38,7 @@
 
   .preview-image {
     width: 100%;
-    padding-top: 100%;
+    padding-top: 50%;
     background-size: cover;
     background-position: center;
     margin-bottom: 16px;
