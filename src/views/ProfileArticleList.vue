@@ -1,5 +1,8 @@
 <template>
   <div class="article-list-page">
+    <router-link class="button" to="/profile/articles/new">
+      Создать статью
+    </router-link>
     <div class="list">
       <router-link
         v-for="article in articleList"
@@ -71,6 +74,28 @@ articleStore.gerMyArticles().then(({data}) => {
         margin-bottom: 16px;
       }
 
+    }
+  }
+
+  .button {
+    width: max-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    border-radius: 8px;
+    color: #373535;
+    background-color: white;
+    font-weight: bold;
+    border: 1px solid #373535;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 8px 16px;
+    margin-bottom: 16px;
+
+    &:hover {
+      background-color: #373535;
+      color: white;
     }
   }
 }
