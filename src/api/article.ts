@@ -17,6 +17,14 @@ export const articleApi = {
       }
     })
   },
+  sendArticleReview (review: unknown) {
+    const token = localStorage.token
+    return axios.post(`${baseApiUrl}/article/review`, review, {
+      headers: {
+        authorization: token
+      }
+    })
+  },
   gerMyArticles() {
     const token = localStorage.token
     return axios.get(`${baseApiUrl}/my-articles`, {
@@ -27,6 +35,9 @@ export const articleApi = {
   },
   getArticleById (id: string) {
     return axios.get(`${baseApiUrl}/article/${id}`)
+  },
+  getArticlePopular () {
+    return axios.get(`${baseApiUrl}/articles/popular`)
   },
   getArticleByIdFull (id: string) {
     return axios.get(`${baseApiUrl}/article-full/${id}`)

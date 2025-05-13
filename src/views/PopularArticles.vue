@@ -6,27 +6,19 @@
     </div>
     <div class="articles-list">
       <div
-        v-for="item in popularArticles"
+        v-for="item in 30"
         :key="item"
         class="article-item"
       >
         <ArticleCard :article="item" />
       </div>
     </div>
+
   </main>
 </template>
 
 <script setup lang="ts">
 import ArticleCard from '@/components/articles/article-card.vue'
-import { useArticleStore } from '@/stores/article.ts'
-import { onMounted, ref } from 'vue'
-const articlesStore = useArticleStore()
-const popularArticles = ref([])
-onMounted( () => {
-  articlesStore.getArticlePopular().then(({ data }) => {
-    popularArticles.value = data.data
-  })
-})
 </script>
 
 <style lang="scss" scoped>

@@ -4,12 +4,6 @@
       <img src="@/assets/img/logo.webp">
     </router-link>
     <div class="links">
-      <router-link to="/" class="link">
-        Популярное
-      </router-link>
-      <router-link to="/" class="link">
-        Свежее
-      </router-link>
       <div
         v-if="!user"
         class="link"

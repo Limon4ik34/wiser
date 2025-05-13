@@ -1,32 +1,36 @@
 <template>
-  <div class="article-card">
+  <router-link :to="`/articles/${article.id}`" class="article-card">
     <div
       class="preview-image"
-      :style="{backgroundImage: `url(https://mortwood.purplelabs.eu/img/upload/1479491072-1.jpg)`}"
+      :style="{backgroundImage: `url(${article.previewImage})`}"
     />
     <div class="title">
-      Заголовок статьи
+      {{ article.title }}
     </div>
     <div class="text">
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit. A architecto enim ex modi, tempore veritatis? Libero officia repellat repellendus? Aut!
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit. A architecto enim ex modi, tempore veritatis? Libero officia repellat repellendus? Aut!
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit. A architecto enim ex modi, tempore veritatis? Libero officia repellat repellendus? Aut!
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit. A architecto enim ex modi, tempore veritatis? Libero officia repellat repellendus? Aut!
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit. A architecto enim ex modi, tempore veritatis? Libero officia repellat repellendus? Aut!
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit. A architecto enim ex modi, tempore veritatis? Libero officia repellat repellendus? Aut!
+      {{ article.description }}
     </div>
     <div class="author">
       <div
+        v-if="article.author.avatar"
         class="avatar"
-        :style="{backgroundImage: `url(https://yt3.googleusercontent.com/ytc/AIdro_kwiB5Ji4n19kCVY4Rtd-fODRSperExvoniNy6YDex5Peo=s900-c-k-c0x00ffffff-no-rj)`}"
+        :style="{backgroundImage: `url(${article.author.avatar})`}"
       />
+      <div
+        v-else
+        class="avatar"
+      > {{ article.author.nik[0] }}</div>
       <div class="name">
-        Сангвиний
+        {{ article.author.nik }}
       </div>
     </div>
-  </div>
+  </router-link>
 </template>
 <script setup lang="ts">
+
+defineProps<{
+  article: unknown
+}>()
 
 </script>
 
@@ -35,6 +39,7 @@
 .article-card {
   width: 100%;
   background-color: white;
+  display: block;
 
   .preview-image {
     width: 100%;
@@ -88,10 +93,14 @@
       width: 50px;
       height: 50px;
       border-radius: 50%;
-      background-color: plum;
       margin-right: 8px;
       background-size: cover;
       background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      border: 1px solid #32364a;
     }
 
     .name {

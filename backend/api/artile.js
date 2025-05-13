@@ -25,6 +25,22 @@ export default function(server) {
       res.status(403).sendWrapped({})
     }
   })
+  server.post('/article/review', async (query, res) => {
+    if (query.headers.authorization) {
+      const user = pkg.verify(query.headers.authorization, 'shhhhh')
+      const body = query.body
+      body.userId = user.id
+      db.addReview(body).then((article) => {
+        res.status(201).sendWrapped(article)
+      }).catch((err) => {
+        res.status(402).sendWrapped({
+          err
+        })
+      })
+    } else {
+      res.status(403).sendWrapped({})
+    }
+  })
   server.get('/my-articles', async (query, res) => {
     if (query.headers.authorization) {
       const user = pkg.verify(query.headers.authorization, 'shhhhh')
@@ -38,6 +54,16 @@ export default function(server) {
     } else {
       res.status(403).sendWrapped({})
     }
+  })
+  server.get('/articles/popular', async (query, res) => {
+    db.getPopularArticles().then((articles) => {
+      res.status(200).sendWrapped(articles)
+    }).catch((err) => {
+      res.status(402).sendWrapped({
+        err
+      })
+    })
+
   })
   server.get('/article/:id', async (query, res) => {
     query.params.id

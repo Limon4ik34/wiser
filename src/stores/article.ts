@@ -17,12 +17,20 @@ export const useArticleStore = defineStore('article', () => {
   function getArticleById(id:string) {
     return articleApi.getArticleById(id)
   }
+  function getArticlePopular() {
+    return articleApi.getArticlePopular()
+  }
   function getArticleFullById(id:string) {
     return articleApi.getArticleByIdFull(id)
+  }
+  function sendArticleReview(data:unknown) {
+    return articleApi.sendArticleReview(data)
   }
 
   return {
     getArticleFullById,
+    sendArticleReview,
+    getArticlePopular,
     getArticleById,
     gerMyArticles,
     createArticle,

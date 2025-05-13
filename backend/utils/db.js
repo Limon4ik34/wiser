@@ -73,6 +73,24 @@ export default {
     })
     return res
   },
+  async addReview(reviewData) {
+    let res = new Promise((resolve, reject) => {
+      const sql = `
+            INSERT INTO reviews (userId, articleId, rating, comment) VALUES('${reviewData.userId ? reviewData.userId: 'anonymous'}',
+            '${reviewData.articleId}','${reviewData.rating}','${reviewData.comment}')
+            `
+      connection.query(sql, function (err, results) {
+        if (err) {
+          console.log('err', err)
+          reject(err)
+        } else {
+          console.log(results);
+          resolve(results)
+        }
+      });
+    })
+    return res
+  },
   async getMyArticle(authorId) {
     let res = new Promise((resolve, reject) => {
       const sql = `SELECT * FROM artiles WHERE authorId='${authorId}'`;
@@ -88,17 +106,34 @@ export default {
     })
     return res
   },
-  async getArticle(id) {
+  async getArticle(id, userId) {
     let res = new Promise((resolve, reject) => {
       const sql = `SELECT * FROM artiles WHERE id='${id}'`;
-      connection.query(sql, function (err, results) {
+      connection.query(sql, (err, results) => {
         if (err || !results[0]) {
           console.log('reject')
           reject(err)
         } else {
-          resolve(results[0])
+          // resolve(results[0])
           console.log('resolve')
         }
+      });
+    })
+    return res
+  },
+  async getArticleReviews(articleId) {
+    let res = new Promise((resolve, reject) => {
+      const sql = `SELECT * FROM reviews WHERE  articleId='${articleId}'`;
+      connection.query(sql, function (err, results) {
+        console.log(results);
+        resolve(results)
+        // if (err || !results[0]) {
+        //   console.log('reject')
+        //   reject(err)
+        // } else {
+        //   resolve(results)
+        //   console.log('resolve')
+        // }
       });
     })
     return res
@@ -116,7 +151,10 @@ export default {
             delete user.about
             delete user.login
             results[0].author = user;
-            resolve(results[0])
+            this.getArticleReviews(results[0].id).then((reviews) => {
+              results[0].reviews = reviews;
+              resolve(results[0])
+            })
           })
           console.log('resolve')
         }
@@ -124,6 +162,48 @@ export default {
     })
     return res
   },
+  async getPopularArticles() {
+    let res = new Promise((resolve, reject) => {
+      const sql = `SELECT * FROM artiles`;
+      connection.query(sql, (err, results) => {
+        if (err || !results[0]) {
+          console.log('reject')
+          reject(err)
+        } else {
+          results.forEach((result) => {
+            this.getUserById(result.authorId).then((user) => {
+              delete user.password
+              delete user.about
+              delete user.login
+              result.author = user;
+              result.rating = {
+                sum: 0,
+                count: 0,
+              };
+              this.getArticleReviews(result.id).then((reviews) => {
+                console.log('reviews', reviews);
+                result.reviews = reviews;
+                reviews.forEach(review => {
+                  result.rating.count += 1
+                  result.rating.sum += review.rating
+                })
+                result.rating.value = result.rating.sum / result.rating.count ? Math.floor(result.rating.sum / result.rating.count) : 0
+              })
+            })
+          })
+          setTimeout(() => {
+            results = results.sort((a, b) => {
+              return a.rating.value > b.rating.value ? -1 : 1
+            })
+            resolve(results)
+          }, 500)
+          console.log('resolve')
+        }
+      });
+    })
+    return res
+  },
+
 
   async getUserById(id) {
     let res = new Promise((resolve, reject) => {
