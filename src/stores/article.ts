@@ -26,10 +26,18 @@ export const useArticleStore = defineStore('article', () => {
   function sendArticleReview(data:unknown) {
     return articleApi.sendArticleReview(data)
   }
+  function getArticleByStatus(status:string) {
+    return articleApi.getArticleByStatus(status)
+  }
+  function setArticleByStatus(id: unknown, status:string) {
+    return articleApi.setArticleByStatus(id, status)
+  }
 
   return {
     getArticleFullById,
     sendArticleReview,
+    setArticleByStatus,
+    getArticleByStatus,
     getArticlePopular,
     getArticleById,
     gerMyArticles,

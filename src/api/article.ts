@@ -41,5 +41,26 @@ export const articleApi = {
   },
   getArticleByIdFull (id: string) {
     return axios.get(`${baseApiUrl}/article-full/${id}`)
-  }
+  },
+  getArticleByStatus (status: string) {
+    const token = localStorage.token
+    return axios.post(`${baseApiUrl}/article-list`, {
+      status
+    },{
+      headers: {
+        authorization: token
+      }
+    })
+  },
+  setArticleByStatus (id: unknown, status: string) {
+    const token = localStorage.token
+    return axios.post(`${baseApiUrl}/article-set-status`, {
+      id,
+      status
+    },{
+      headers: {
+        authorization: token
+      }
+    })
+  },
 }

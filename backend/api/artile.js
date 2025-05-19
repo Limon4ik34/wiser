@@ -25,6 +25,46 @@ export default function(server) {
       res.status(403).sendWrapped({})
     }
   })
+  server.post('/article-list', async (query, res) => {
+    if (query.headers.authorization) {
+      const user = pkg.verify(query.headers.authorization, 'shhhhh')
+      const body = query.body
+      if (body.status === 'all') {
+        db.getAllArticle().then((article) => {
+          res.status(201).sendWrapped(article)
+        }).catch((err) => {
+          res.status(402).sendWrapped({
+            err
+          })
+        })
+      } else {
+        db.getArticleStatus(body.status).then((article) => {
+          res.status(201).sendWrapped(article)
+        }).catch((err) => {
+          res.status(402).sendWrapped({
+            err
+          })
+        })
+      }
+    } else {
+      res.status(403).sendWrapped({})
+    }
+  })
+  server.post('/article-set-status', async (query, res) => {
+    if (query.headers.authorization) {
+      const user = pkg.verify(query.headers.authorization, 'shhhhh')
+      const body = query.body
+      db.setArticleStatus(body.id, body.status).then((article) => {
+        res.status(201).sendWrapped(article)
+      }).catch((err) => {
+        res.status(402).sendWrapped({
+          err
+        })
+      })
+    } else {
+      res.status(403).sendWrapped({})
+    }
+  })
   server.post('/article/review', async (query, res) => {
     if (query.headers.authorization) {
       const user = pkg.verify(query.headers.authorization, 'shhhhh')

@@ -36,6 +36,11 @@ const router = createRouter({
       name: 'article-read',
       component: () => import('../views/ArticleView.vue'),
     },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../views/Admin.vue'),
+    },
   ],
 })
 

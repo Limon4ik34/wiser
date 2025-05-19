@@ -106,9 +106,54 @@ export default {
     })
     return res
   },
+  async getArticleStatus(status) {
+    let res = new Promise((resolve, reject) => {
+      const sql = `SELECT * FROM artiles WHERE status='${status}'`;
+      connection.query(sql, function (err, results) {
+        if (err || !results[0]) {
+          console.log('reject')
+          reject(err)
+        } else {
+          resolve(results)
+          console.log('resolve')
+        }
+      });
+    })
+    return res
+  },
+  async getAllArticle() {
+    let res = new Promise((resolve, reject) => {
+      const sql = `SELECT * FROM artiles`;
+      connection.query(sql, function (err, results) {
+        if (err) {
+          console.log('reject')
+          reject(err)
+        } else {
+          resolve(results)
+          console.log('resolve')
+        }
+      });
+    })
+    return res
+  },
   async getArticle(id, userId) {
     let res = new Promise((resolve, reject) => {
       const sql = `SELECT * FROM artiles WHERE id='${id}'`;
+      connection.query(sql, (err, results) => {
+        if (err || !results[0]) {
+          console.log('reject')
+          reject(err)
+        } else {
+          // resolve(results[0])
+          console.log('resolve')
+        }
+      });
+    })
+    return res
+  },
+  async setArticleStatus(id, status) {
+    let res = new Promise((resolve, reject) => {
+      const sql = `UPDATE artiles SET status = '${status}' WHERE id=${id}`;
       connection.query(sql, (err, results) => {
         if (err || !results[0]) {
           console.log('reject')
@@ -164,7 +209,7 @@ export default {
   },
   async getPopularArticles() {
     let res = new Promise((resolve, reject) => {
-      const sql = `SELECT * FROM artiles`;
+      const sql = `SELECT * FROM artiles WHERE status='accept'`;
       connection.query(sql, (err, results) => {
         if (err || !results[0]) {
           console.log('reject')
