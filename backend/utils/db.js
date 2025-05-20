@@ -54,12 +54,47 @@ export default {
     })
     return res
   },
+  async editUserData(user) {
+    // const sql = `UPDATE artiles SET status = '${status}' WHERE id=${id}`;
+    let res = new Promise((resolve, reject) => {
+      const sql = `UPDATE users SET avatar = '${user.avatar}', about = '${user.about}' WHERE id=${user.id}`;
+      connection.query(sql, function (err, results) {
+        console.log('err');
+        if (err) {
+          console.log('reject')
+          reject(err)
+        } else {
+          resolve(results)
+          console.log('resolve')
+        }
+      });
+    })
+    return res
+  },
   async createArticle(article) {
     article.dateCreate = Date.now()
     let res = new Promise((resolve, reject) => {
       const sql = `
             INSERT INTO artiles (title, description, text, previewImage, authorId, dateCreate) VALUES('${article.title}',
             '${article.description}','${article.text}','${article.previewImage}','${article.authorId}','${article.dateCreate}')
+            `
+      connection.query(sql, function (err, results) {
+        if (err) {
+          console.log('err', err)
+          reject(err)
+        } else {
+          console.log(results);
+          resolve(results)
+        }
+      });
+    })
+    return res
+  },
+  async updateArticle(article) {
+    let res = new Promise((resolve, reject) => {
+      const sql = `
+            UPDATE artiles SET title = '${article.title}', description = '${article.description}', text = '${article.text}', previewImage = '${article.previewImage}'
+            WHERE id = ${article.id}
             `
       connection.query(sql, function (err, results) {
         if (err) {
@@ -137,6 +172,7 @@ export default {
     return res
   },
   async getArticle(id, userId) {
+    console.log('getArticle')
     let res = new Promise((resolve, reject) => {
       const sql = `SELECT * FROM artiles WHERE id='${id}'`;
       connection.query(sql, (err, results) => {
@@ -144,7 +180,7 @@ export default {
           console.log('reject')
           reject(err)
         } else {
-          // resolve(results[0])
+          resolve(results[0])
           console.log('resolve')
         }
       });
@@ -155,11 +191,11 @@ export default {
     let res = new Promise((resolve, reject) => {
       const sql = `UPDATE artiles SET status = '${status}' WHERE id=${id}`;
       connection.query(sql, (err, results) => {
-        if (err || !results[0]) {
+        if (err) {
           console.log('reject')
           reject(err)
         } else {
-          // resolve(results[0])
+          resolve(true)
           console.log('resolve')
         }
       });

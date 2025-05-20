@@ -1,16 +1,16 @@
 <template>
-  <router-link :to="`/articles/${article.id}`" class="article-card">
+  <div  class="article-card">
     <div
       class="preview-image"
       :style="{backgroundImage: `url(${article.previewImage})`}"
     />
-    <div class="title">
+    <router-link :to="`/articles/${article.id}`" class="title">
       {{ article.title }}
-    </div>
+    </router-link>
     <div class="text">
       {{ article.description }}
     </div>
-    <div class="author">
+    <router-link :to="`/author/${article.author.id}`" class="author">
       <div
         v-if="article.author.avatar"
         class="avatar"
@@ -23,8 +23,8 @@
       <div class="name">
         {{ article.author.nik }}
       </div>
-    </div>
-  </router-link>
+    </router-link>
+  </div>
 </template>
 <script setup lang="ts">
 

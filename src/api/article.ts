@@ -17,6 +17,14 @@ export const articleApi = {
       }
     })
   },
+  updateArticle (article: unknown) {
+    const token = localStorage.token
+    return axios.patch(`${baseApiUrl}/article`, article, {
+      headers: {
+        authorization: token
+      }
+    })
+  },
   sendArticleReview (review: unknown) {
     const token = localStorage.token
     return axios.post(`${baseApiUrl}/article/review`, review, {

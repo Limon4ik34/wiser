@@ -25,6 +25,27 @@ export default function(server) {
       res.status(403).sendWrapped({})
     }
   })
+  server.get('/article/:id', async (query, res) => {
+    console.log('here')
+    db.getArticle(+query.params.id).then((articles) => {
+      res.status(200).sendWrapped(articles)
+    }).catch((err) => {
+      res.status(402).sendWrapped({
+        err
+      })
+    })
+
+  })
+  server.patch('/article', async (query, res) => {
+    const body = query.body
+    db.updateArticle(body).then((articles) => {
+      res.status(200).sendWrapped(articles)
+    }).catch((err) => {
+      res.status(402).sendWrapped({
+        err
+      })
+    })
+  })
   server.post('/article-list', async (query, res) => {
     if (query.headers.authorization) {
       const user = pkg.verify(query.headers.authorization, 'shhhhh')
@@ -97,17 +118,6 @@ export default function(server) {
   })
   server.get('/articles/popular', async (query, res) => {
     db.getPopularArticles().then((articles) => {
-      res.status(200).sendWrapped(articles)
-    }).catch((err) => {
-      res.status(402).sendWrapped({
-        err
-      })
-    })
-
-  })
-  server.get('/article/:id', async (query, res) => {
-    query.params.id
-    db.getArticle(+query.params.id).then((articles) => {
       res.status(200).sendWrapped(articles)
     }).catch((err) => {
       res.status(402).sendWrapped({

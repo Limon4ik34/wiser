@@ -92,9 +92,16 @@ function uploadImage(event: Event) {
 }
 
 function createArticle() {
-  articleStore.createArticle(articleModel.value).then(({ data }) => {
-    console.log(data)
-  })
+  if (id === 'new') {
+    articleStore.createArticle(articleModel.value).then(({ data }) => {
+      console.log(data)
+    })
+  } else {
+    articleModel.value.id = +id
+    articleStore.updateArticle(articleModel.value).then(({ data }) => {
+      console.log(data)
+    })
+  }
 }
 
 function openHelper() {

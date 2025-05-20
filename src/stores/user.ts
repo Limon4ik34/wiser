@@ -19,9 +19,18 @@ export const useUserStore = defineStore('user', () => {
       delete localStorage.token
     })
   }
-
+  function getAuthorData(id: unknown) {
+    return authApi.getAuthorData(id)
+  }
+  function setUserData(user: unknown) {
+    authApi.setUserData(user).then(() => {
+      getUserData()
+    })
+  }
   return {
     user,
-    getUserData
+    getUserData,
+    getAuthorData,
+    setUserData
   }
 })

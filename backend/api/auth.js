@@ -45,4 +45,27 @@ export default function (server) {
       res.status(404).sendWrapped({})
     })
   })
+  server.get('/author/:id', async (query, res) => {
+    query.params.id
+    const user = pkg.verify(query.headers.authorization, 'shhhhh')
+    db.getUserById(+query.params.id).then((userData) => {
+      delete userData.password
+      res.status(200).sendWrapped(userData)
+    }).catch((err) => {
+      res.status(404).sendWrapped({})
+    })
+  })
+  server.patch('/auth/user-data', async (query, res) => {
+    if (query.headers.authorization) {
+      const user = pkg.verify(query.headers.authorization, 'shhhhh')
+      const body = query.body
+      db.editUserData(body).then((userData) => {
+        res.status(200).sendWrapped({})
+      }).catch((err) => {
+        res.status(404).sendWrapped({})
+      })
+    } else {
+      res.status(403).sendWrapped({})
+    }
+  })
 }

@@ -14,5 +14,21 @@ export const authApi = {
         authorization: token
       }
     })
-  }
+  },
+  getAuthorData (id: unknown) {
+    const token = localStorage.token
+    return axios.get(`${baseApiUrl}/author/${id}`, {
+      headers: {
+        authorization: token
+      }
+    })
+  },
+  setUserData (userData: unknown) {
+    const token = localStorage.token
+    return axios.patch(`${baseApiUrl}/auth/user-data`, userData,{
+      headers: {
+        authorization: token
+      }
+    })
+  },
 }

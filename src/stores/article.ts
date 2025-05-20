@@ -11,6 +11,9 @@ export const useArticleStore = defineStore('article', () => {
   function createArticle(article: unknown) {
     return articleApi.createArticle(article)
   }
+  function updateArticle(article: unknown) {
+    return articleApi.updateArticle(article)
+  }
   function gerMyArticles() {
     return articleApi.gerMyArticles()
   }
@@ -35,6 +38,7 @@ export const useArticleStore = defineStore('article', () => {
 
   return {
     getArticleFullById,
+    updateArticle,
     sendArticleReview,
     setArticleByStatus,
     getArticleByStatus,

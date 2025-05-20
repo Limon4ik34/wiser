@@ -28,6 +28,7 @@
           <div v-if="!user.avatar" class="letter">
             {{user.nik[0]}}
           </div>
+          <div class="avatar-img" :style="{backgroundImage: `url(${user.avatar})`}"/>
         </div>
       </router-link>
     </div>

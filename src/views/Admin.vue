@@ -26,7 +26,7 @@
         Отклоненые
       </div>
     </div>
-    <table>
+    <table v-if="articles.length">
       <thead>
       <tr>
         <td>
@@ -76,21 +76,38 @@
       </tr>
       </tbody>
     </table>
+    <div v-else class="empty">
+      Статьи отсутсвуют
+    </div>
   </div>
 </template>
 <script setup lang="ts">
 import { useArticleStore } from '@/stores/article.ts'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { useUserStore } from '@/stores/user.ts'
+import { useRouter } from 'vue-router'
 
 const articleStore = useArticleStore()
 const articles = ref([])
+const currentStatus = ref('')
+onMounted(() => {
+  if (useUserStore().user.role !== 'admin') {
+    useRouter().replace('/')
+  } else {
+    getArticles('all')
+  }
+})
 function getArticles(status: string) {
+  currentStatus.value = status
   articleStore.getArticleByStatus(status).then((res) => {
     articles.value = res.data.data
+  }).catch(() => {
+    articles.value = []
   })
 }
 function setStatus(id: unknown, status: string) {
   articleStore.setArticleByStatus(id, status).then((res) => {
+    getArticles(currentStatus.value)
     // articles.value = res.data.data
   })
 }
@@ -102,6 +119,11 @@ function setStatus(id: unknown, status: string) {
     padding: 8px 16px;
     cursor: pointer;
   }
+}
+
+.empty {
+  font-size: 24px;
+  text-align: center;
 }
 
 table, th, td {
