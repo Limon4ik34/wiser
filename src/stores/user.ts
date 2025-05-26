@@ -1,6 +1,7 @@
 import { ref, computed, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import { authApi } from '@/api/auth.ts'
+
 export interface IUser {
   nik: string
   login: string
@@ -9,6 +10,7 @@ export interface IUser {
   phone: string
   email: string
 }
+
 export const useUserStore = defineStore('user', () => {
   const user: Ref<IUser | null> = ref(null)
 
@@ -17,20 +19,30 @@ export const useUserStore = defineStore('user', () => {
       user.value = data.data
     }).catch(() => {
       delete localStorage.token
+      user.value = null
     })
   }
+
   function getAuthorData(id: unknown) {
     return authApi.getAuthorData(id)
   }
-  function setUserData(user: unknown) {
-    authApi.setUserData(user).then(() => {
+
+  function setUserData(userData: unknown) {
+    authApi.setUserData(userData).then(() => {
       getUserData()
     })
   }
+
+  function logout() {
+    delete localStorage.token
+    user.value = null
+  }
+
   return {
     user,
     getUserData,
     getAuthorData,
-    setUserData
+    setUserData,
+    logout,  
   }
 })

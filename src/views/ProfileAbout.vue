@@ -3,7 +3,7 @@
     <div class="about">
       <div class="avatar">
         <div class="field-title">
-          Загрузите автар, что бы вас узнавали
+          Загрузите аватар, чтобы вас узнавали
         </div>
         <label class="uploader">
           <div
@@ -12,7 +12,11 @@
             :style="{ backgroundImage: `url(${userModel.avatar})` }"
           />
           <div v-else class="uploader-preview">
-            Загрузить аватар
+            <svg width="48" height="48" fill="none" viewBox="0 0 24 24">
+              <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="4" y="16" width="16" height="4" rx="2" fill="#6366f1" fill-opacity="0.1"/>
+            </svg>
+            <span>Загрузить аватар</span>
           </div>
           <input type="file" @change="uploadImage">
         </label>
@@ -57,7 +61,7 @@ function uploadImage(event: Event) {
   if (files) {
     articleStore.uploadImage(files[0]).then(({ data }) => {
       userModel.value.avatar = data.data.image
-      target.files = null
+      target.value = ''
     })
   }
 }
@@ -149,85 +153,148 @@ const config = computed( () => {
 <style scoped lang="scss">
 .profile-about {
   width: 100%;
-  padding: 16px;
+  max-width: 600px;
+  margin: 32px auto;
+  padding: 32px 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(60, 72, 88, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.about {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .field-title {
-  margin-bottom: 8px ;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.input {
-  margin-bottom: 16px;
-  input {
-    width: 100%;
-    border: 1px solid gray;
-    border-radius: 8px;
-    padding: 8px;
-    font-size: 16px;
-    outline: none;
-
-    &.error {
-      border: 1px solid red;
-    }
-  }
-}
-
-.button {
-  width: 100%;
-  height: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-transform: uppercase;
-  border-radius: 8px;
+  margin-bottom: 8px;
+  font-weight: 700;
+  font-size: 16px;
   color: #373535;
-  background-color: white;
-  font-weight: bold;
-  border: 1px solid #373535;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 16px;
-
-  &:hover {
-    background-color: #373535;
-    color: white;
-  }
+  letter-spacing: 0.5px;
 }
 
 .uploader {
-  margin-bottom: 16px;
+  margin-bottom: 24px;
   cursor: pointer;
-  width: 250px;
-  height: 250px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(60, 72, 88, 0.10);
+  background: #fff;
+  transition: box-shadow 0.3s;
+  margin-left: auto; 
+  margin-right: auto; 
+
+  &:hover {
+    box-shadow: 0 8px 32px rgba(60, 72, 88, 0.18);
+  }
 
   .image-preview {
-    padding-top: 50%;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
     background-size: cover;
     background-position: center center;
     position: relative;
-    width: 250px;
-    height: 250px;
-    border-radius: 50%;
+    transition: filter 0.3s;
+    border: 3px solid #6366f1;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.10);
+
+    &:hover {
+      filter: brightness(0.95) blur(1px);
+    }
   }
 
   .uploader-preview {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #32364a;
-    width: 250px;
-    height: 250px;
+    border: 2px dashed #6366f1;
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
-
+    color: #6366f1;
+    font-size: 18px;
+    background: #f1f5f9;
+    transition: background 0.3s;
+    &:hover {
+      background: #e0e7ff;
+    }
   }
   input {
     display: none;
+  }
+}
+
+.article-editor {
+  width: 100%;
+  margin-bottom: 24px;
+  .ck-editor__editable {
+    min-height: 120px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(60, 72, 88, 0.04);
+    padding: 12px;
+    font-size: 16px;
+    transition: border 0.2s;
+    &:focus {
+      border: 1.5px solid #6366f1;
+    }
+  }
+}
+
+.button {
+  width: 100%;
+  max-width: 220px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(90deg, #6366f1 0%, #818cf8 100%);
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.10);
+  margin-top: 24px;
+  letter-spacing: 1px;
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+
+  &:hover {
+    background: linear-gradient(90deg, #818cf8 0%, #6366f1 100%);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.18);
+    transform: translateY(-2px) scale(1.03);
+  }
+}
+
+@media (max-width: 700px) {
+  .profile-about {
+    padding: 16px 4px;
+    border-radius: 12px;
+  }
+  .uploader, .uploader .image-preview, .uploader .uploader-preview {
+    width: 120px;
+    height: 120px;
+  }
+  .button {
+    max-width: 100%;
+    font-size: 15px;
+    height: 44px;
   }
 }
 </style>
