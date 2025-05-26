@@ -17,7 +17,12 @@
 
     <!-- Автор статьи -->
     <div class="author">
-      <div class="avatar">
+      <div
+        v-if="article.author.avatar" class="avatar img"
+        :style="{backgroundImage: `url('${article.author.avatar}')`}"
+      >
+      </div>
+      <div v-else class="avatar">
         <div class="letter">
           {{ article.author.nik[0] }}
         </div>
@@ -29,64 +34,78 @@
 
     <!-- Отзывы -->
     <div class="reviews-section">
-      <h2>Отзывы</h2>
-      <div v-if="article.reviews.length === 0" class="no-reviews">
-        Пока нет отзывов. Будьте первым!
-      </div>
-      <div v-for="review in article.reviews" :key="review.id" class="review-item">
-        <div class="review-header">
-          <div class="avatar">
-            <img v-if="review.userAvatar" :src="review.userAvatar" alt="avatar" />
-            <div v-else class="letter">
-              {{ review.userNik ? review.userNik[0] : 'А' }}
-            </div>
-          </div>
-          <div class="user-info">
-            <div class="user-nik">
-              {{ review.isAnonymous ? 'Аноним' : review.userNik || 'Пользователь' }}
-            </div>
-            <div class="review-date">
-              {{ dateFormat(review.dateCreate) }}
-            </div>
-          </div>
-          <div class="stars">
-            <div v-for="i in 5" :key="i" class="star">
-              <img :src="review.rating >= i ? starActive : star" />
-            </div>
-          </div>
+      <div>
+        <h2>Отзывы</h2>
+        <div v-if="article.reviews.length === 0" class="no-reviews">
+          Пока нет отзывов. Будьте первым!
         </div>
-        <div class="review-comment" v-if="review.comment && review.comment.trim() !== ''">
-          {{ review.comment }}
+        <div v-for="review in article.reviews" :key="review.id" class="review-item">
+          <div class="review-header">
+            <div class="avatar">
+              <img v-if="review.user.avatar" :src="review.user.avatar" alt="avatar" />
+              <div v-else class="letter">
+                {{ review.user.nik ? review.user.nik[0] : 'А' }}
+              </div>
+            </div>
+            <div class="user-info">
+              <div class="user-nik">
+                {{  review.user.nik }}
+              </div>
+              <div class="review-date">
+                {{ dateFormat(review.dateCreate) }}
+              </div>
+            </div>
+            <div class="stars">
+              <div v-for="i in 5" :key="i" class="star">
+                <img :src="review.rating >= i ? starActive : star" />
+              </div>
+            </div>
+          </div>
+          <div class="review-comment" v-if="review.comment && review.comment.trim() !== ''">
+            {{ review.comment }}
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Форма оценки и комментария -->
-    <div class="rating-form">
-      <h2>Оцените статью и оставьте комментарий</h2>
-      <div class="stars">
-        <div
-          v-for="i in 5"
-          :key="i"
-          class="star"
-          :class="{ active: ratingFormData.rating >= i }"
-          @click="ratingFormData.rating = i"
-        >
-          <img :src="ratingFormData.rating >= i ? starActive : star" />
+    <div v-if="user" class="rating-form">
+      <div v-if="article.isCommeted">
+        <h2>Вы уже оставляли свой комментарий</h2>
+      </div>
+      <div v-else >
+        <h2>Оцените статью и оставьте комментарий</h2>
+        <div class="stars">
+          <div
+            v-for="i in 5"
+            :key="i"
+            class="star"
+            :class="{ active: ratingFormData.rating >= i }"
+            @click="ratingFormData.rating = i"
+          >
+            <img :src="ratingFormData.rating >= i ? starActive : star" />
+          </div>
         </div>
+        <div class="textarea">
+          <textarea v-model="ratingFormData.comment" placeholder="Ваш комментарий (необязательно)" />
+        </div>
+        <div class="checkbox-anon">
+          <input type="checkbox" id="anon" v-model="ratingFormData.isAnonymous" />
+          <label for="anon">Оставить анонимно</label>
+        </div>
+        <div class="button" @click="sendReview" :disabled="sending">
+          {{ sending ? 'Отправка...' : 'Отправить' }}
+        </div>
+        <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
       </div>
-      <div class="textarea">
-        <textarea v-model="ratingFormData.comment" placeholder="Ваш комментарий (необязательно)" />
-      </div>
-      <div class="checkbox-anon">
-        <input type="checkbox" id="anon" v-model="ratingFormData.isAnonymous" />
-        <label for="anon">Оставить анонимно</label>
-      </div>
-      <div class="button" @click="sendReview" :disabled="sending">
-        {{ sending ? 'Отправка...' : 'Отправить' }}
-      </div>
-      <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+
     </div>
+    <div v-else class="rating-form">
+      <div>
+        <h2>Авторизируйтесь что бы оставить комментарий</h2>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -98,6 +117,7 @@ import { dateFormat } from '@/shared/utils.ts'
 
 import starActive from '@/assets/img/star-active.svg'
 import star from '@/assets/img/star.svg'
+import { useUserStore } from '@/stores/user.ts'
 
 interface Review {
   id: number
@@ -126,6 +146,8 @@ const route = useRoute()
 const article = ref<Article | null>(null)
 const sending = ref(false)
 const errorMessage = ref('')
+const userStore = useUserStore()
+const user = computed(() => userStore.user)
 
 const ratingFormData = ref<{
   articleId: number
@@ -281,10 +303,11 @@ async function sendReview() {
       box-shadow: 0 4px 12px rgba(31, 38, 135, 0.25);
       user-select: none;
       transition: background 0.3s ease;
+      overflow: hidden;
 
-      &:hover {
-        background: linear-gradient(135deg, #6c7a89 0%, #4f5d75 100%);
-        cursor: default;
+      &.img {
+        background-size: cover;
+        background-position: center;
       }
     }
 

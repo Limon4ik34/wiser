@@ -75,8 +75,8 @@ export default {
     article.dateCreate = Date.now()
     let res = new Promise((resolve, reject) => {
       const sql = `
-            INSERT INTO artiles (title, description, text, previewImage, authorId, dateCreate) VALUES('${article.title}',
-            '${article.description}','${article.text}','${article.previewImage}','${article.authorId}','${article.dateCreate}')
+            INSERT INTO artiles (title, description, text, previewImage, authorId, dateCreate, theme) VALUES('${article.title}',
+            '${article.description}','${article.text}','${article.previewImage}','${article.authorId}','${article.dateCreate}','${article.theme}')
             `
       connection.query(sql, function (err, results) {
         if (err) {
@@ -93,7 +93,7 @@ export default {
   async updateArticle(article) {
     let res = new Promise((resolve, reject) => {
       const sql = `
-            UPDATE artiles SET title = '${article.title}', description = '${article.description}', text = '${article.text}', previewImage = '${article.previewImage}'
+            UPDATE artiles SET title = '${article.title}', description = '${article.description}', text = '${article.text}', previewImage = '${article.previewImage}', theme = '${article.theme}'
             WHERE id = ${article.id}
             `
       connection.query(sql, function (err, results) {
@@ -110,9 +110,10 @@ export default {
   },
   async addReview(reviewData) {
     let res = new Promise((resolve, reject) => {
+      reviewData.dateCreate = Date.now()
       const sql = `
-            INSERT INTO reviews (userId, articleId, rating, comment) VALUES('${reviewData.userId ? reviewData.userId: 'anonymous'}',
-            '${reviewData.articleId}','${reviewData.rating}','${reviewData.comment}')
+            INSERT INTO reviews (userId, articleId, rating, comment, dateCreate, isAnonymous) VALUES('${reviewData.userId ? reviewData.userId: 'anonymous'}',
+            '${reviewData.articleId}','${reviewData.rating}','${reviewData.comment}', '${reviewData.dateCreate}', '${reviewData.isAnonymous ? 1 : 0}')
             `
       connection.query(sql, function (err, results) {
         if (err) {
@@ -203,11 +204,34 @@ export default {
     return res
   },
   async getArticleReviews(articleId) {
+    console.log('getArticleReviews')
     let res = new Promise((resolve, reject) => {
       const sql = `SELECT * FROM reviews WHERE  articleId='${articleId}'`;
-      connection.query(sql, function (err, results) {
+      connection.query(sql, (err, results) => {
         console.log(results);
-        resolve(results)
+        if (results[0]) {
+          results.forEach((review) => {
+            if (review.userId !== 'anonymous' && !review.isAnonymous) {
+              this.getUserById(review.userId).then(user => {
+                delete user.password
+                delete user.login
+                delete user.role
+                delete user.phone
+                delete user.email
+                review.user = user
+              })
+            } else {
+              review.user = {
+                nik: 'Аноним'
+              }
+            }
+          })
+          setTimeout(() => {
+            resolve(results)
+          }, 300)
+        } else {
+          resolve([])
+        }
         // if (err || !results[0]) {
         //   console.log('reject')
         //   reject(err)
@@ -219,7 +243,8 @@ export default {
     })
     return res
   },
-  async getArticleFull(id) {
+  async getArticleFull(id, userId) {
+    console.log('getArticleFull')
     let res = new Promise((resolve, reject) => {
       const sql = `SELECT * FROM artiles WHERE id='${id}'`;
       connection.query(sql, (err, results) => {
@@ -232,7 +257,13 @@ export default {
             delete user.about
             delete user.login
             results[0].author = user;
+            results[0].isCommeted = false
             this.getArticleReviews(results[0].id).then((reviews) => {
+              console.log('getArticleReviews')
+              console.log('userId', userId)
+              if (userId && reviews.length) {
+                results[0].isCommeted = !!reviews.find(review => review.userId === userId);
+              }
               results[0].reviews = reviews;
               resolve(results[0])
             })
@@ -243,10 +274,11 @@ export default {
     })
     return res
   },
-  async getPopularArticles() {
+  async getPopularArticles(theme) {
     let res = new Promise((resolve, reject) => {
       const sql = `SELECT * FROM artiles WHERE status='accept'`;
-      connection.query(sql, (err, results) => {
+      const sql2 = `SELECT * FROM artiles WHERE status='accept' AND theme='${theme}'`;
+      connection.query(theme === 'all' ? sql : sql2, (err, results) => {
         if (err || !results[0]) {
           console.log('reject')
           reject(err)

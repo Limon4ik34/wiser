@@ -9,15 +9,28 @@
     <div class="list-title">
       Лучшие статьи за все время
     </div>
-    <transition-group name="fade" tag="div" class="articles-list">
+    <div class="tabs">
       <div
-        v-for="item in popularArticles"
-        :key="item.id"
-        class="article-item"
+        v-for="theme in themesList"
+        class="tab"
+        @click="getArticle(theme.value)"
+        :class="{active: currentTheme === theme.value}"
       >
-        <ArticleCard :article="item" />
+        {{ theme.title }}
       </div>
-    </transition-group>
+    </div>
+    <transition mode="out-in" name="fade" tag="div" class="articles-list">
+      <div v-if="popularArticles.length">
+        <div
+          v-for="item in popularArticles"
+          :key="item.id"
+          class="article-item"
+        >
+          <ArticleCard :article="item" />
+        </div>
+      </div>
+
+    </transition>
   </main>
 </template>
 
@@ -27,10 +40,46 @@ import { useArticleStore } from '@/stores/article.ts'
 import { onMounted, ref } from 'vue'
 const articlesStore = useArticleStore()
 const popularArticles = ref([])
-onMounted(() => {
-  articlesStore.getArticlePopular().then(({ data }) => {
+const currentTheme = ref('all')
+const themesList = ref([
+  {
+    title: 'Все',
+    value: 'all'
+  },
+  {
+    title: 'Общая',
+    value: 'common'
+  },
+  {
+    title: 'Рыбалка',
+    value: 'fishing'
+  },
+  {
+    title: 'Игры',
+    value: 'gaming'
+  },
+  {
+    title: 'Автомобили',
+    value: 'cars'
+  },
+  {
+    title: 'Футбол',
+    value: 'football'
+  },
+  {
+    title: 'Активный отдых',
+    value: 'activity'
+  }
+])
+function getArticle(theme: unknown) {
+  popularArticles.value = []
+  currentTheme.value = theme
+    articlesStore.getArticlePopular(theme).then(({ data }) => {
     popularArticles.value = data.data
   })
+}
+onMounted(() => {
+  getArticle('all')
 })
 </script>
 
@@ -67,6 +116,48 @@ onMounted(() => {
   .main-subtitle {
     font-size: 22px;
     opacity: 0.85;
+  }
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: 16px;
+
+  .tab {
+    background: #4a90e2;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 26px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(74,144,226,0.3);
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+    user-select: none;
+    margin-right: 16px;
+    &:hover {
+      background: #357abd;
+      box-shadow: 0 6px 16px rgba(53,122,189,0.45);
+      transform: translateY(-2px) scale(1.04);
+      text-decoration: none;
+      color: #fff;
+    }
+    &.active {
+      background: #357abd;
+      box-shadow: 0 6px 16px rgba(53,122,189,0.45);
+      transform: translateY(-2px) scale(1.04);
+      text-decoration: none;
+      color: #fff;
+    }
+    &:active {
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 3px 8px rgba(53,122,189,0.25);
+    }
   }
 }
 

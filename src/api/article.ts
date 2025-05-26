@@ -44,11 +44,24 @@ export const articleApi = {
   getArticleById (id: string) {
     return axios.get(`${baseApiUrl}/article/${id}`)
   },
-  getArticlePopular () {
-    return axios.get(`${baseApiUrl}/articles/popular`)
+  getArticlePopular (theme: unknown) {
+    const token = localStorage.token
+    return axios.get(`${baseApiUrl}/articles/popular`, {
+      params: {
+        theme
+      },
+      headers: {
+        authorization: token
+      }
+    })
   },
   getArticleByIdFull (id: string) {
-    return axios.get(`${baseApiUrl}/article-full/${id}`)
+    const token = localStorage.token
+    return axios.get(`${baseApiUrl}/article-full/${id}`, {
+      headers: {
+        authorization: token
+      }
+    })
   },
   getArticleByStatus (status: string) {
     const token = localStorage.token

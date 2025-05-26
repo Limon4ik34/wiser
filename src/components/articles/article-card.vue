@@ -62,7 +62,7 @@ defineProps<{
     -webkit-box-orient: vertical;
     line-clamp: 2;
     line-height: 22px;
-    height: 44px;
+    height: 54px;
     margin-bottom: 16px;
     color: #818181;
   }

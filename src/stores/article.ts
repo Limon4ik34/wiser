@@ -20,8 +20,8 @@ export const useArticleStore = defineStore('article', () => {
   function getArticleById(id:string) {
     return articleApi.getArticleById(id)
   }
-  function getArticlePopular() {
-    return articleApi.getArticlePopular()
+  function getArticlePopular(theme: unknown) {
+    return articleApi.getArticlePopular(theme)
   }
   function getArticleFullById(id:string) {
     return articleApi.getArticleByIdFull(id)

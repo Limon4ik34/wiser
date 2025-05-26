@@ -117,7 +117,8 @@ export default function(server) {
     }
   })
   server.get('/articles/popular', async (query, res) => {
-    db.getPopularArticles().then((articles) => {
+    const { theme } = getQueryParams(query.query)
+    db.getPopularArticles(theme).then((articles) => {
       res.status(200).sendWrapped(articles)
     }).catch((err) => {
       res.status(402).sendWrapped({
@@ -127,8 +128,13 @@ export default function(server) {
 
   })
   server.get('/article-full/:id', async (query, res) => {
-    query.params.id
-    db.getArticleFull(+query.params.id).then((article) => {
+    let userId = null
+    if (query.headers.authorization) {
+      const user = pkg.verify(query.headers.authorization, 'shhhhh')
+      console.log('user', user)
+      userId = user.id
+    }
+    db.getArticleFull(+query.params.id, +userId).then((article) => {
       res.status(200).sendWrapped(article)
     }).catch((err) => {
       res.status(402).sendWrapped({

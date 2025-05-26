@@ -23,6 +23,11 @@
     <div class="field-title">
       Дайте вашей статье оригинальное название
     </div>
+    <select v-model="articleModel.theme">
+      <option v-for="item in themesList"  :value="item.value" >
+        {{ item.title }}
+      </option>
+    </select>
     <div class="input">
       <input
         type="text"
@@ -58,20 +63,47 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { Ckeditor, useCKEditorCloud } from '@ckeditor/ckeditor5-vue';
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useArticleStore } from '@/stores/article.ts'
 import { useModalStore } from '@/stores/modals.ts'
 const articleStore = useArticleStore()
 const modalStore = useModalStore()
+const router = useRouter()
 
 const id = useRoute().params.id;
 const articleModel = ref({
   title: '',
+  theme: 'common',
   description: '',
   text: '',
   previewImage: '',
 })
-
+const themesList = ref([
+  {
+    title: 'Общая',
+    value: 'common'
+  },
+  {
+    title: 'Рыбалка',
+    value: 'fishing'
+  },
+  {
+    title: 'Игры',
+    value: 'gaming'
+  },
+  {
+    title: 'Автомобили',
+    value: 'cars'
+  },
+  {
+    title: 'Футбол',
+    value: 'football'
+  },
+  {
+    title: 'Активный отдых',
+    value: 'activity'
+  }
+])
 onMounted(() => {
   if (id !== 'new') {
     articleStore.getArticleById(id.toString()).then(({data}) => {
@@ -95,11 +127,13 @@ function createArticle() {
   if (id === 'new') {
     articleStore.createArticle(articleModel.value).then(({ data }) => {
       console.log(data)
+      router.replace('/profile/articles')
     })
   } else {
     articleModel.value.id = +id
     articleStore.updateArticle(articleModel.value).then(({ data }) => {
       console.log(data)
+      router.replace('/profile/articles')
     })
   }
 }
@@ -234,6 +268,18 @@ const config = computed( () => {
     font-size: 1.05rem;
     color: #232946;
     margin-top: 18px;
+  }
+
+  select {
+    width: 100%;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 1.1rem;
+    outline: none;
+    background: #f7f7fa;
+    transition: border 0.2s, box-shadow 0.2s;
+    margin-bottom: 18px;
   }
 
   .input {
