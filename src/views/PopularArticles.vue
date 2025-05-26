@@ -82,7 +82,7 @@ import ArticleCard from '@/components/articles/article-card.vue'
 
   .article-item {
     transition: transform 0.2s, box-shadow 0.2s;
-    border-radius: 16px;
+    border-radius: 4834px;
     box-shadow: 0 2px 12px rgba(50, 54, 74, 0.07);
     background: #fff;
     overflow: hidden;

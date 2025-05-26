@@ -6,21 +6,24 @@
         <div class="main-subtitle">Читайте лучшие статьи нашего портала</div>
       </div>
     </div>
-    <div class="list-title">
-      Лучшие статьи за все время
-    </div>
-    <div class="tabs">
+    <div class="tabs" role="tablist" aria-label="Категории статей">
       <div
         v-for="theme in themesList"
+        :key="theme.value"
         class="tab"
+        role="tab"
+        :aria-selected="currentTheme === theme.value"
+        tabindex="0"
         @click="getArticle(theme.value)"
+        @keydown.enter.space.prevent="getArticle(theme.value)"
         :class="{active: currentTheme === theme.value}"
       >
-        {{ theme.title }}
+        <span class="tab-icon" aria-hidden="true">{{ theme.icon }}</span>
+        <span class="tab-title">{{ theme.title }}</span>
       </div>
     </div>
-    <transition mode="out-in" name="fade" tag="div" class="articles-list">
-      <div v-if="popularArticles.length">
+    <transition mode="out-in" name="fade" tag="div" class="articles-list" aria-live="polite">
+      <div v-if="popularArticles.length" key="articles">
         <div
           v-for="item in popularArticles"
           :key="item.id"
@@ -29,7 +32,9 @@
           <ArticleCard :article="item" />
         </div>
       </div>
-
+      <div v-else key="no-articles" class="no-articles">
+        Статьи не найдены.
+      </div>
     </transition>
   </main>
 </template>
@@ -38,46 +43,28 @@
 import ArticleCard from '@/components/articles/article-card.vue'
 import { useArticleStore } from '@/stores/article.ts'
 import { onMounted, ref } from 'vue'
+
 const articlesStore = useArticleStore()
 const popularArticles = ref([])
 const currentTheme = ref('all')
 const themesList = ref([
-  {
-    title: 'Все',
-    value: 'all'
-  },
-  {
-    title: 'Общая',
-    value: 'common'
-  },
-  {
-    title: 'Рыбалка',
-    value: 'fishing'
-  },
-  {
-    title: 'Игры',
-    value: 'gaming'
-  },
-  {
-    title: 'Автомобили',
-    value: 'cars'
-  },
-  {
-    title: 'Футбол',
-    value: 'football'
-  },
-  {
-    title: 'Активный отдых',
-    value: 'activity'
-  }
+  { title: 'Все', value: 'all', icon: '📚' },
+  { title: 'Общая', value: 'common', icon: '📰' },
+  { title: 'Рыбалка', value: 'fishing', icon: '🎣' },
+  { title: 'Игры', value: 'gaming', icon: '🎮' },
+  { title: 'Автомобили', value: 'cars', icon: '🚗' },
+  { title: 'Футбол', value: 'football', icon: '⚽' },
+  { title: 'Активный отдых', value: 'activity', icon: '🏕️' }
 ])
-function getArticle(theme: unknown) {
+
+function getArticle(theme: string) {
   popularArticles.value = []
   currentTheme.value = theme
-    articlesStore.getArticlePopular(theme).then(({ data }) => {
+  articlesStore.getArticlePopular(theme).then(({ data }) => {
     popularArticles.value = data.data
   })
 }
+
 onMounted(() => {
   getArticle('all')
 })
@@ -119,48 +106,6 @@ onMounted(() => {
   }
 }
 
-.tabs {
-  display: flex;
-  margin-bottom: 16px;
-
-  .tab {
-    background: #4a90e2;
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 10px 26px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 10px rgba(74,144,226,0.3);
-    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
-    user-select: none;
-    margin-right: 16px;
-    &:hover {
-      background: #357abd;
-      box-shadow: 0 6px 16px rgba(53,122,189,0.45);
-      transform: translateY(-2px) scale(1.04);
-      text-decoration: none;
-      color: #fff;
-    }
-    &.active {
-      background: #357abd;
-      box-shadow: 0 6px 16px rgba(53,122,189,0.45);
-      transform: translateY(-2px) scale(1.04);
-      text-decoration: none;
-      color: #fff;
-    }
-    &:active {
-      transform: translateY(-1px) scale(1.02);
-      box-shadow: 0 3px 8px rgba(53,122,189,0.25);
-    }
-  }
-}
-
 .list-title {
   font-size: 28px;
   text-align: center;
@@ -171,6 +116,78 @@ onMounted(() => {
   color: #32364a;
   letter-spacing: 1.5px;
 }
+
+.tabs {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  justify-content: center; 
+
+  .tab {
+    flex: 0 0 auto;
+    background: linear-gradient(135deg, #4a90e2, #357abd);
+    color: #fff;
+    border-radius: 40px;
+    padding: 12px 28px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 6px 15px rgba(53,122,189,0.4);
+    user-select: none;
+    transition:
+      background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.3s ease;
+
+    &:hover,
+    &:focus-visible {
+      background: linear-gradient(135deg, #2c5db0, #1f3f7a);
+      box-shadow: 0 10px 25px rgba(31,63,122,0.6);
+      transform: translateY(-3px) scale(1.07);
+      outline: none;
+      color: #e0e7ff;
+    }
+
+    &.active {
+      background: linear-gradient(135deg, #1a3a75, #0f244a);
+      box-shadow: 0 12px 30px rgba(15,36,74,0.8);
+      transform: translateY(-4px) scale(1.1);
+      color: #cbd5e1;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40%;
+        height: 4px;
+        border-radius: 2px;
+        background: #ffd700;
+        box-shadow: 0 0 8px #ffd700;
+      }
+    }
+
+    &:active {
+      transform: translateY(-1px) scale(1.05);
+      box-shadow: 0 6px 18px rgba(31,63,122,0.5);
+    }
+
+    .tab-icon {
+      font-size: 1.4rem;
+      line-height: 1;
+      user-select: none;
+      transition: color 0.3s ease;
+    }
+  }
+}
+ 
 
 .articles-list {
   display: flex;
@@ -197,9 +214,18 @@ onMounted(() => {
   }
 }
 
-/* Fade animation for transition-group */
+
+.no-articles {
+  width: 100%;
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
+  padding: 40px 0;
+  font-style: italic;
+}
+
 .fade-enter-active, .fade-leave-active {
-  transition: all 0.5s;
+  transition: all 0.5s ease;
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
